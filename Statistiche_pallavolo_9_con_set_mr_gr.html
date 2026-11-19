@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Conteggio Errori Pallavolo</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Arial,sans-serif;
+    background:#f4f4f4;
+    margin:15px;
+    text-align:center;
+}
+
+h1{
+    color:#333;
+}
+
+.info-partita{
+    max-width:1000px;
+    margin:0 auto 20px;
+    background:#fff;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 2px 6px rgba(0,0,0,.15);
+
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:15px;
+}
+
+.campo{
+    display:flex;
+    flex-direction:column;
+    text-align:left;
+}
+
+.campo input{
+    padding:10px;
+}
+
+.set-selector{
+    margin:20px auto;
+    font-size:20px;
+}
+
+.set-selector select{
+    padding:8px;
+    font-size:18px;
+}
+
+.container{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:20px;
+    max-width:900px;
+    margin:auto;
+}
+
+.counter{
+    background:#fff;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 2px 6px rgba(0,0,0,.15);
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:space-between;
+
+    min-height:240px;
+}
+
+.value{
+    font-size:56px;
+    font-weight:bold;
+    color:#d32f2f;
+}
+
+.controls{
+    display:flex;
+    gap:10px;
+}
+
+.plus,
+.minus{
+    border:none;
+    border-radius:8px;
+    color:#fff;
+    font-size:26px;
+    min-width:90px;
+    min-height:60px;
+    cursor:pointer;
+}
+
+.plus{
+    background:#2e7d32;
+}
+
+.minus{
+    background:#c62828;
+}
+
+#totale{
+    margin-top:30px;
+    font-size:32px;
+    font-weight:bold;
+}
+
+.buttons{
+    margin-top:25px;
+}
+
+.reset,
+.report{
+    padding:14px 24px;
+    border:none;
+    border-radius:8px;
+    color:#fff;
+    cursor:pointer;
+}
+
+.reset{
+    background:#f57c00;
+}
+
+.report{
+    background:#1976d2;
+}
+
+.riepilogo{
+    margin-top:40px;
+}
+
+.riepilogo table{
+    margin:auto;
+    border-collapse:collapse;
+    background:white;
+}
+
+.riepilogo th,
+.riepilogo td{
+    border:1px solid #ccc;
+    padding:10px;
+}
+
+.riepilogo th{
+    background:#eaeaea;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>Conteggio Errori Pallavolo</h1>
+
+<div class="info-partita">
+
+    <div class="campo">
+        <label>Data Partita</label>
+        <input type="date" id="dataPartita">
+    </div>
+
+    <div class="campo">
+        <label>Categoria</label>
+        <input id="categoria">
+    </div>
+
+    <div class="campo">
+        <label>Luogo</label>
+        <input id="luogo">
+    </div>
+
+    <div class="campo">
+        <label>Squadra Casa</label>
+        <input id="squadraCasa">
+    </div>
+
+    <div class="campo">
+        <label>Squadra Ospite</label>
+        <input id="squadraOspite">
+    </div>
+
+</div>
+
+<div class="set-selector">
+
+    <strong>Set Corrente:</strong>
+
+    <select id="setCorrente">
+        <option value="0">1° Set</option>
+        <option value="1">2° Set</option>
+        <option value="2">3° Set</option>
+        <option value="3">4° Set</option>
+        <option value="4">5° Set</option>
+    </select>
+
+</div>
+
+<div class="container">
+
+    <div class="counter">
+        <h2>Battuta</h2>
+        <div class="value" id="battuta">0</div>
+
+        <div class="controls">
+            <button class="plus" onclick="modifica('battuta',1)">+</button>
+            <button class="minus" onclick="modifica('battuta',-1)">-</button>
+        </div>
+    </div>
+
+    <div class="counter">
+        <h2>Difesa</h2>
+        <div class="value" id="difesa">0</div>
+
+        <div class="controls">
+            <button class="plus" onclick="modifica('difesa',1)">+</button>
+            <button class="minus" onclick="modifica('difesa',-1)">-</button>
+        </div>
+    </div>
+
+    <div class="counter">
+        <h2>Palleggio</h2>
+        <div class="value" id="palleggio">0</div>
+
+        <div class="controls">
+            <button class="plus" onclick="modifica('palleggio',1)">+</button>
+            <button class="minus" onclick="modifica('palleggio',-1)">-</button>
+        </div>
+    </div>
+
+    <div class="counter">
+        <h2>Attacco</h2>
+        <div class="value" id="attacco">0</div>
+
+        <div class="controls">
+            <button class="plus" onclick="modifica('attacco',1)">+</button>
+            <button class="minus" onclick="modifica('attacco',-1)">-</button>
+        </div>
+    </div>
+
+    <div class="counter">
+        <h2>Ricezione</h2>
+        <div class="value" id="ricezione">0</div>
+
+        <div class="controls">
+            <button class="plus" onclick="modifica('ricezione',1)">+</button>
+            <button class="minus" onclick="modifica('ricezione',-1)">-</button>
+        </div>
+    </div>
+
+    <div class="counter">
+        <h2>Muro</h2>
+        <div class="value" id="muro">0</div>
+
+        <div class="controls">
+            <button class="plus" onclick="modifica('muro',1)">+</button>
+            <button class="minus" onclick="modifica('muro',-1)">-</button>
+        </div>
+    </div>
+
+</div>
+
+<div id="totale">
+    Totale Errori: 0
+</div>
+
+<div class="buttons">
+
+    <button class="reset" onclick="resetContatori()">
+        Azzera Tutto
+    </button>
+
+    <button class="report" onclick="generaReport()">
+        Genera Report
+    </button>
+
+</div>
+
+<div class="riepilogo">
+
+    <h2>Riepilogo Errori per Set</h2>
+
+    <table>
+
+        <thead>
+            <tr>
+                <th>Fondamentale</th>
+                <th>1° Set</th>
+                <th>2° Set</th>
+                <th>3° Set</th>
+                <th>4° Set</th>
+                <th>5° Set</th>
+            </tr>
+        </thead>
+
+        <tbody id="riepilogoSet">
+        </tbody>
+
+    </table>
+
+</div>
+
+<script>
+
+const contatori = [
+    "battuta",
+    "difesa",
+    "palleggio",
+    "attacco",
+    "ricezione",
+    "muro"
+];
+
+let chartFondamentali;
+let chartSet;
+
+const erroriPerSet = {
+    battuta:[0,0,0,0,0],
+    difesa:[0,0,0,0,0],
+    palleggio:[0,0,0,0,0],
+    attacco:[0,0,0,0,0],
+    ricezione:[0,0,0,0,0],
+    muro:[0,0,0,0,0]
+};
+
+function modifica(id,variazione){
+
+    const setCorrente =
+        parseInt(
+            document.getElementById("setCorrente").value
+        );
+
+    erroriPerSet[id][setCorrente] += variazione;
+
+    if(erroriPerSet[id][setCorrente] < 0){
+        erroriPerSet[id][setCorrente] = 0;
+    }
+
+    document.getElementById(id).textContent =
+    erroriPerSet[id][setCorrente];
+
+    aggiornaTotale();
+	aggiornaGraficoFondamentali();
+	aggiornaGraficoSet();
+}
+
+document.getElementById("setCorrente").addEventListener("change", function () {
+
+    const setCorrente = parseInt(this.value);
+
+    contatori.forEach(id => {
+        document.getElementById(id).textContent =
+            erroriPerSet[id][setCorrente];
+    });
+
+    aggiornaTotale();
+});
+
+function aggiornaTotale(){
+
+    let totale = 0;
+
+    contatori.forEach(id=>{
+
+        totale += erroriPerSet[id]
+        .reduce((a,b)=>a+b,0);
+
+    });
+
+    document.getElementById("totale").textContent =
+        "Totale Errori: " + totale;
+
+    aggiornaTabellaSet();
+}
+
+function aggiornaTabellaSet(){
+
+    let html = "";
+
+    contatori.forEach(nome=>{
+
+        html += `
+        <tr>
+            <td>${nome}</td>
+            <td>${erroriPerSet[nome][0]}</td>
+            <td>${erroriPerSet[nome][1]}</td>
+            <td>${erroriPerSet[nome][2]}</td>
+            <td>${erroriPerSet[nome][3]}</td>
+            <td>${erroriPerSet[nome][4]}</td>
+        </tr>
+        `;
+    });
+
+    document.getElementById("riepilogoSet").innerHTML =
+        html;
+}
+
+function resetContatori(){
+
+    if(!confirm("Azzerare tutti i dati?")){
+        return;
+    }
+
+    contatori.forEach(nome=>{
+
+        erroriPerSet[nome] = [0,0,0,0,0];
+
+        document.getElementById(nome).textContent = 0;
+    });
+
+    aggiornaTotale();
+}
+
+function generaReport() {
+
+    let csv = "";
+
+    csv += "Data;" + document.getElementById("dataPartita").value + "\n";
+    csv += "Categoria;" + document.getElementById("categoria").value + "\n";
+    csv += "Luogo;" + document.getElementById("luogo").value + "\n";
+    csv += "Casa;" + document.getElementById("squadraCasa").value + "\n";
+    csv += "Ospite;" + document.getElementById("squadraOspite").value + "\n";
+    csv += "\n";
+
+    csv += "Fondamentale;Set1;Set2;Set3;Set4;Set5\n";
+
+    contatori.forEach(nome => {
+        csv += [
+            nome.toUpperCase(),
+            erroriPerSet[nome][0],
+            erroriPerSet[nome][1],
+            erroriPerSet[nome][2],
+            erroriPerSet[nome][3],
+            erroriPerSet[nome][4]
+        ].join(";") + "\n";
+    });
+
+    const totaliSet = [0, 0, 0, 0, 0];
+
+    contatori.forEach(nome => {
+        for (let i = 0; i < 5; i++) {
+            totaliSet[i] += erroriPerSet[nome][i];
+        }
+    });
+
+    csv += [
+        "TOTALE",
+        totaliSet[0],
+        totaliSet[1],
+        totaliSet[2],
+        totaliSet[3],
+        totaliSet[4]
+    ].join(";") + "\n";
+
+    const blob = new Blob(
+        ["\uFEFF" + csv],
+        { type: "text/csv;charset=utf-8;" }
+    );
+
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "Report_Errori_Pallavolo.csv";
+    link.click();
+}
+
+aggiornaTotale();
+
+function aggiornaGraficoFondamentali() {
+
+    const labels = contatori.map(c =>
+        c.charAt(0).toUpperCase() + c.slice(1)
+    );
+
+    const dati = contatori.map(c =>
+        erroriPerSet[c].reduce((a,b)=>a+b,0)
+    );
+
+    if(chartFondamentali){
+        chartFondamentali.destroy();
+    }
+
+    chartFondamentali = new Chart(
+        document.getElementById('graficoFondamentali'),
+        {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Errori Totali',
+                    data: dati,
+                    backgroundColor: '#e74c3c'
+                }]
+            }
+        }
+    );
+}
+
+function aggiornaGraficoSet() {
+
+    const totaliSet = [0,0,0,0,0];
+
+    contatori.forEach(nome => {
+        for(let i=0;i<5;i++){
+            totaliSet[i] += erroriPerSet[nome][i];
+        }
+    });
+
+    if(chartSet){
+        chartSet.destroy();
+    }
+
+    chartSet = new Chart(
+        document.getElementById('graficoSet'),
+        {
+            type: 'bar',
+            data: {
+                labels: [
+                    '1° Set',
+                    '2° Set',
+                    '3° Set',
+                    '4° Set',
+                    '5° Set'
+                ],
+                datasets: [{
+                    label: 'Totale Errori',
+                    data: totaliSet,
+                    backgroundColor: '#3498db'
+                }]
+            }
+        }
+    );
+}
+
+aggiornaGraficoFondamentali();
+aggiornaGraficoSet();
+
+</script>
+<hr>
+
+<h3>Errori per Fondamentale</h3>
+<canvas id="graficoFondamentali"></canvas>
+
+<br><br>
+
+<h3>Errori per Set</h3>
+<canvas id="graficoSet"></canvas>
+
+</body>
+</html>
